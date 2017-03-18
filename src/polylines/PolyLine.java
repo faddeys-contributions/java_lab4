@@ -1,12 +1,12 @@
 package polylines;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringJoiner;
 
 
-public class PolyLine implements Iterable<Point> {
+public class PolyLine implements Iterable<Point>, Serializable {
 
     protected final List<Point> points;
 
@@ -25,6 +25,10 @@ public class PolyLine implements Iterable<Point> {
 
     public void addPoint(int position, Point point) {
         points.add(position, point);
+    }
+
+    public void appendPoint(Point point) {
+        points.add(point);
     }
 
     public void removePoint(int position) {

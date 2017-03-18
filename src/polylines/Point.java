@@ -1,7 +1,9 @@
 package polylines;
 
+import java.io.Serializable;
 
-public class Point {
+
+public class Point implements Serializable {
 
     private final int _x;
     private final int _y;
