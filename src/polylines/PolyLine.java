@@ -35,6 +35,10 @@ public class PolyLine implements Iterable<Point>, Serializable {
         points.remove(position);
     }
 
+    public int size() {
+        return points.size();
+    }
+
     public double length() {
         double result = 0;
         for (int i = 1; i < points.size(); i++) {
