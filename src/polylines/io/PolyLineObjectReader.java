@@ -9,14 +9,18 @@ import java.io.ObjectInputStream;
 
 public class PolyLineObjectReader implements IPolyLineReader {
 
-    private ObjectInputStream reader;
+    private ObjectInputStream reader = null;
+    private InputStream _passed_stream;
 
-    public PolyLineObjectReader(InputStream stream) throws IOException {
-        reader = new ObjectInputStream(stream);
+    public PolyLineObjectReader(InputStream stream) {
+        _passed_stream = stream;
     }
 
     @Override
     public PolyLine readLine() throws IOException {
+        if (reader == null) {
+            reader = new ObjectInputStream(_passed_stream);
+        }
         try {
             Object obj = reader.readObject();
             if (!(obj instanceof PolyLine)) {

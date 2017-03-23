@@ -8,14 +8,18 @@ import java.io.OutputStream;
 
 public class PolyLineObjectWriter implements IPolyLineWriter {
 
-    private ObjectOutputStream writer;
+    private ObjectOutputStream writer = null;
+    private OutputStream _passed_stream;
 
-    public PolyLineObjectWriter(OutputStream stream) throws IOException {
-        writer = new ObjectOutputStream(stream);
+    public PolyLineObjectWriter(OutputStream stream) {
+        _passed_stream = stream;
     }
 
     @Override
     public void writeLine(PolyLine pl) throws IOException {
+        if (writer == null) {
+            writer = new ObjectOutputStream(_passed_stream);
+        }
         writer.writeObject(pl);
     }
 }
