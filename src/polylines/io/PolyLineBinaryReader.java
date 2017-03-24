@@ -37,9 +37,9 @@ public class PolyLineBinaryReader implements IPolyLineReader {
 
     private void checkSignature() throws IOException {
         char signature[] = {
-                (char) reader.readByte(),
-                (char) reader.readByte(),
-                (char) reader.readByte()
+                (char) reader.readUnsignedByte(),
+                (char) reader.readUnsignedByte(),
+                (char) reader.readUnsignedByte()
         };
         if (!Arrays.equals(signature, "PLB".toCharArray())) {
             throw new IOException("Not a poly-line binary file");

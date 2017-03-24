@@ -5,24 +5,22 @@ import polylines.Point;
 import polylines.PolyLine;
 import polylines.PolyLineExt;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 public class PolyLineCSVWriter implements IPolyLineWriter {
 
-    private OutputStreamWriter writer;
+    private DataOutput writer;
 
     public PolyLineCSVWriter(OutputStream stream) {
-        writer = new OutputStreamWriter(stream);
+        writer = new DataOutputStream(stream);
     }
 
     public void writeLine(PolyLine line) throws IOException{
-        writer.write((line instanceof PolyLineExt) ? "e" : "b");
+        writer.writeBytes((line instanceof PolyLineExt) ? "e" : "b");
         for (Point p : line) {
-            writer.write("," + p.x() + " " + p.y());
+            writer.writeBytes("," + p.x() + " " + p.y());
         }
-        writer.write("\n");
+        writer.writeBytes("\n");
     }
 
 }

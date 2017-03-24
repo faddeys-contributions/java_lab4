@@ -33,7 +33,7 @@ public class PolyLineCSVReader implements IPolyLineReader {
         } else {
             line = new PolyLineExt();
         }
-        while(!scanner.hasNext("\n")) {
+        while(!scanner.hasNext("\n") && scanner.hasNext()) {
             line.appendPoint(readPoint());
         }
         return line;

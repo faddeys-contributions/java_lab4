@@ -15,8 +15,8 @@ public class LinesConverterProgram {
     static {
         READERS = new HashMap<>();
         READERS.put("csv", PolyLineCSVReader::new);
-//        READERS.put("bin", PolyLineBinaryReader::new);
-//        READERS.put("java", PolyLineObjectReader::new);
+        READERS.put("bin", PolyLineBinaryReader::new);
+        READERS.put("java", PolyLineObjectReader::new);
 
         WRITERS = new HashMap<>();
         WRITERS.put("csv", PolyLineCSVWriter::new);
@@ -37,6 +37,7 @@ public class LinesConverterProgram {
             log("Input file not found");
             return;
         }
+        inputStream = new BufferedInputStream(inputStream);
 
         OutputStream outputStream;
         try{
@@ -47,11 +48,13 @@ public class LinesConverterProgram {
         }
 
         PolyLine line = null;
+        inputStream.mark(100);
         for(Map.Entry<String, Function<InputStream, IPolyLineReader>> e : READERS.entrySet()) {
             IPolyLineReader reader = e.getValue().apply(inputStream);
             try {
                 line = reader.readLine();
             } catch (IOException exc) {
+                try{ inputStream.reset(); } catch (IOException ignored) {}
                 continue;
             }
             log("Detected input format: " + e.getKey());
@@ -66,6 +69,8 @@ public class LinesConverterProgram {
         IPolyLineWriter writer = WRITERS.get(argv[2]).apply(outputStream);
         try {
             writer.writeLine(line);
+            outputStream.flush();
+            outputStream.close();
         } catch (IOException exc) {
             log("Got error while writing output file: "+exc.getMessage());
             return;
