@@ -1,6 +1,7 @@
 package task3;
 
 import com.sun.istack.internal.NotNull;
+import utils.IOUtils;
 
 import java.io.*;
 import java.util.Date;
@@ -116,27 +117,16 @@ public class DirectoryCopyProgram {
                 return;
             }
         }
-        File filesToCopy[] = args.inputDir.listFiles();
-        for(File file : filesToCopy) {
+        for(File file : args.inputDir.listFiles()) {
             if (!wasModified(file, args.nDays)) continue;
             if (file.isDirectory()) {
                 output.println("Skipping directory: " + file.getName());
                 continue;
             }
-            try(
-                    InputStream source = new BufferedInputStream(new FileInputStream(file));
-                    OutputStream destination = new FileOutputStream(
-                            args.outputDir.getAbsolutePath()
-                            + File.separator + file.getName())
-            ) {
-
-                byte buffer[] = new byte[1024];
-                int nBytes;
-                while(true) {
-                    nBytes = source.read(buffer);
-                    if (nBytes < 0) break;
-                    destination.write(buffer, 0, nBytes);
-                }
+            String destination = args.outputDir.getAbsolutePath()
+                    + File.separator + file.getName();
+            try {
+                IOUtils.copyFile(file, destination);
                 output.println("Copied file: " + file.getName());
             } catch (FileNotFoundException exc) {
                 output.println("Cannot copy file: " + file.getName());
