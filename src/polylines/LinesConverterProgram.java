@@ -5,6 +5,8 @@ import polylines.io.*;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -27,7 +29,7 @@ public class LinesConverterProgram {
     public static void main(String[] argv) {
         if (argv.length != 3 || !WRITERS.containsKey(argv[2])) {
             log("Arguments: <input-file> <output-file> <format>");
-            log("Format must be one of \"csv\", \"plb\" or \"java\"");
+            log("Format must be one of \"csv\", \"bin\" or \"java\"");
             return;
         }
         InputStream inputStream;
@@ -47,28 +49,40 @@ public class LinesConverterProgram {
             return;
         }
 
-        PolyLine line = null;
+        List<PolyLine> lines = new LinkedList<>();
         inputStream.mark(100);
+        IPolyLineReader reader = null;
         for(Map.Entry<String, Function<InputStream, IPolyLineReader>> e : READERS.entrySet()) {
-            IPolyLineReader reader = e.getValue().apply(inputStream);
+            reader = e.getValue().apply(inputStream);
             try {
-                line = reader.readLine();
+                lines.add(reader.readLine());
             } catch (IOException exc) {
                 try{ inputStream.reset(); } catch (IOException ignored) {}
                 continue;
             }
             log("Detected input format: " + e.getKey());
         }
-        if (line == null) {
+        if (reader == null || lines.size() == 0) {
             log("Cannot detect input file format");
             return;
         }
 
-        log("Got poly-line: " + line.toString());
+        while(true) {
+            try {
+                lines.add(reader.readLine());
+            } catch (IOException exc) {
+                break;
+            }
+        }
+
+        log("Got poly-lines:");
+        for(PolyLine line : lines)
+            log(line.toString());
 
         IPolyLineWriter writer = WRITERS.get(argv[2]).apply(outputStream);
         try {
-            writer.writeLine(line);
+            for(PolyLine line : lines)
+                writer.writeLine(line);
             outputStream.flush();
             outputStream.close();
         } catch (IOException exc) {

@@ -17,11 +17,13 @@ public class PolyLineCSVReader implements IPolyLineReader {
 
     public PolyLineCSVReader(InputStream stream) {
         scanner = new Scanner(stream);
-        scanner.useDelimiter(",");
     }
 
     public PolyLine readLine() throws IOException {
-        char extFlag = readChar();
+        if (!scanner.hasNextLine()) throw new IOException("Unexpected end of input");
+        Scanner lineScanner = new Scanner(scanner.nextLine());
+        lineScanner.useDelimiter(",");
+        char extFlag = readChar(lineScanner);
         if (extFlag != 'b' && extFlag != 'e') {
             throw new IOException(
                     "Extension flag must be either 'b' of 'e'"
@@ -33,14 +35,14 @@ public class PolyLineCSVReader implements IPolyLineReader {
         } else {
             line = new PolyLineExt();
         }
-        while(!scanner.hasNext("\n") && scanner.hasNext()) {
-            line.appendPoint(readPoint());
+        while(lineScanner.hasNext()) {
+            line.appendPoint(readPoint(lineScanner));
         }
         return line;
     }
 
-    private char readChar() throws IOException {
-        String oneChar = readCSVCell();
+    private char readChar(Scanner scanner) throws IOException {
+        String oneChar = readCSVCell(scanner);
         if (oneChar == null) {
             throw new IOException("Expected non-space character");
         }
@@ -50,8 +52,8 @@ public class PolyLineCSVReader implements IPolyLineReader {
         return oneChar.charAt(0);
     }
 
-    private Point readPoint() throws IOException {
-        String token = readCSVCell();
+    private Point readPoint(Scanner scanner) throws IOException {
+        String token = readCSVCell(scanner);
         String maybeNumbers[] = token.split("\\s+");
         if (maybeNumbers.length != 2) {
             throw new IOException("Expected two numbers separated by a space");
@@ -66,7 +68,7 @@ public class PolyLineCSVReader implements IPolyLineReader {
         }
     }
 
-    private String readCSVCell() throws IOException {
+    private String readCSVCell(Scanner scanner) throws IOException {
         try {
             return scanner.next();
         } catch (NoSuchElementException exc) {
