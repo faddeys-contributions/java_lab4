@@ -113,7 +113,7 @@ public class DirectoryCopyProgram {
 
         if (!args.outputDir.exists()) {
             if (!args.outputDir.mkdirs()) {
-                System.err.println("Cannot create oupt directory");
+                System.err.println("Cannot create output directory");
                 return;
             }
         }
